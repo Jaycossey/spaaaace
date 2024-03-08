@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import Loading from './components/Loading';
 
 
 function App() {
   const [apiImage, setApiImage] = useState();
+  const [render, setRender] = useState(<Loading />)
+
   const apiKey = "K47gU4mwIfmUyOoWVw94AhCMEzmJ4YJfwtWmgaDy";
   const potdUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
 
@@ -12,8 +15,7 @@ function App() {
 
   const fetchData = (url) => {
     axios.get(url)
-      .then(res => res.data) // .then setApiImage  
-      .then(data => console.log(data))
+      .then(res => setApiImage(res.data)) // .then setApiImage  
       .catch(err => console.error(err));
   }
 
@@ -22,16 +24,32 @@ function App() {
   // I can then handle the rest of the site from there. Lets get this homepage done first
 
   useEffect(() => {
-    console.log("Hello Console");
-    setApiImage(fetchData(potdUrl));
+    fetchData(potdUrl);
   }, []);
+
+  useEffect(() => {
+    console.log(apiImage);
+  }, [apiImage]);
 
   return (
     <>
       <div className='w-screen 
-                      h-screen 
-                      bg-blue-400'> {/* Change this to blue-900 */}
-
+                      h-screen
+                      flex
+                      bg-gradient-to-br
+                      from-blue-900
+                      to-blue-500'> {/* Change this to blue-900 */}
+        {/* {render} */}
+        <img className='w-screen
+                        fixed'
+              src={apiImage.url} 
+              alt={apiImage.title} />
+        <div className='w-1/2 h-1/2 m-auto p-4 flex flex-col text-slate-900 rounded-lg border-4 border-slate-400 text-justify justify-center items-center bg-slate-500 bg-opacity-60 z-10'>
+          <p className='underline underline-offset-4 text-lg'>{apiImage.title}</p>
+          <br/>
+          <p>{apiImage.explanation}</p>
+          <p>(Click to reveal image)</p>
+        </div>
       </div>
     </>
   )
